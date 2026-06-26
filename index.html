@@ -10,7 +10,7 @@
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #0a1628;
+            background: #0077cc;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -19,22 +19,9 @@
             color: #ffffff;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            animation: gridMove 20s linear infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
+        
 
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(40px, 40px); }
+        
         }
 
         .orb {
@@ -265,7 +252,7 @@
         <div class="card">
             <h1 class="title">PistlePixel</h1>
             <p class="subtitle" data-lang="subtitle">Minecraft Launcher</p>
-            <div class="badge"><span class="dot"></span><span data-lang="badge">First Release Soon</span></div>
+            
 
             <div class="buttons">
                 <button class="btn btn-primary" onclick="document.getElementById('modal').classList.add('active')">
@@ -324,4 +311,5 @@
     </script>
 </body>
 </html>
+
 
