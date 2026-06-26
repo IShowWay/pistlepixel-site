@@ -19,7 +19,6 @@
             color: #ffffff;
         }
 
-        /* Animated grid background */
         body::before {
             content: '';
             position: fixed;
@@ -38,7 +37,6 @@
             100% { transform: translate(40px, 40px); }
         }
 
-        /* Floating orbs */
         .orb {
             position: fixed;
             border-radius: 50%;
@@ -47,25 +45,9 @@
             z-index: 0;
             animation: orbFloat 8s ease-in-out infinite;
         }
-        .orb-1 {
-            width: 300px; height: 300px;
-            background: rgba(255, 80, 40, 0.12);
-            top: -100px; right: -80px;
-            animation-delay: 0s;
-        }
-        .orb-2 {
-            width: 250px; height: 250px;
-            background: rgba(255, 140, 40, 0.10);
-            bottom: -80px; left: -60px;
-            animation-delay: -4s;
-        }
-        .orb-3 {
-            width: 200px; height: 200px;
-            background: rgba(255, 60, 30, 0.08);
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -2s;
-        }
+        .orb-1 { width: 300px; height: 300px; background: rgba(255, 80, 40, 0.12); top: -100px; right: -80px; }
+        .orb-2 { width: 250px; height: 250px; background: rgba(255, 140, 40, 0.10); bottom: -80px; left: -60px; animation-delay: -4s; }
+        .orb-3 { width: 200px; height: 200px; background: rgba(255, 60, 30, 0.08); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -2s; }
 
         @keyframes orbFloat {
             0%, 100% { transform: translate(0, 0) scale(1); }
@@ -80,6 +62,42 @@
             max-width: 440px;
         }
 
+        /* Language switch */
+        .lang-switch {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .lang-toggle {
+            display: flex;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 30px;
+            padding: 4px;
+            gap: 2px;
+        }
+
+        .lang-option {
+            padding: 8px 16px;
+            border-radius: 26px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.4);
+            font-family: inherit;
+        }
+
+        .lang-option.active {
+            background: rgba(255,60,30,0.25);
+            color: #ff8855;
+            box-shadow: 0 2px 10px rgba(255,60,30,0.2);
+        }
+
         .card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(30px);
@@ -88,47 +106,6 @@
             border-radius: 28px;
             padding: 45px 35px;
             text-align: center;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 30px;
-            position: relative;
-        }
-
-        .logo-inner {
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 60, 30, 0.15);
-            border: 1.5px solid rgba(255, 70, 40, 0.4);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 34px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .logo-inner::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(255,80,40,0.3), transparent, rgba(255,120,50,0.2), transparent);
-            animation: logoSpin 4s linear infinite;
-        }
-
-        @keyframes logoSpin {
-            100% { transform: rotate(360deg); }
-        }
-
-        .logo-emoji {
-            position: relative;
-            z-index: 1;
         }
 
         .title {
@@ -179,11 +156,7 @@
             50% { opacity: 0.3; box-shadow: 0 0 2px #ff5520; }
         }
 
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .buttons { display: flex; flex-direction: column; gap: 12px; }
 
         .btn {
             display: flex;
@@ -198,9 +171,6 @@
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid transparent;
-            text-decoration: none;
-            position: relative;
-            overflow: hidden;
             background: transparent;
             color: #fff;
             font-family: inherit;
@@ -212,46 +182,17 @@
             border-color: rgba(255, 80, 40, 0.4);
             color: #ff8855;
         }
-
-        .btn-primary:hover {
-            background: rgba(255, 60, 30, 0.3);
-            border-color: rgba(255, 80, 40, 0.7);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(255, 60, 30, 0.2);
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn-primary:hover::before { left: 100%; }
+        .btn-primary:hover { background: rgba(255, 60, 30, 0.3); border-color: rgba(255, 80, 40, 0.7); transform: translateY(-2px); box-shadow: 0 10px 40px rgba(255, 60, 30, 0.2); }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.02);
             border-color: rgba(255, 255, 255, 0.08);
             color: rgba(255, 170, 110, 0.8);
         }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); color: #ff9966; }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
-            color: #ff9966;
-        }
+        .btn-icon { width: 18px; height: 18px; opacity: 0.7; flex-shrink: 0; }
 
-        .btn-icon {
-            width: 18px;
-            height: 18px;
-            opacity: 0.7;
-            flex-shrink: 0;
-        }
-
-        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -263,7 +204,6 @@
             justify-content: center;
             padding: 20px;
         }
-
         .modal-overlay.active { display: flex; }
 
         .modal {
@@ -275,78 +215,32 @@
             text-align: center;
             max-width: 360px;
             width: 100%;
-            animation: modalIn 0.3s ease;
-        }
-
-        @keyframes modalIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
         }
 
         .modal-icon {
-            width: 60px;
-            height: 60px;
+            width: 60px; height: 60px;
             background: rgba(255, 60, 30, 0.15);
             border: 1px solid rgba(255, 80, 40, 0.3);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; margin: 0 auto 20px;
         }
-
-        .modal h2 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #ffffff;
-        }
-
-        .modal p {
-            color: rgba(255, 180, 140, 0.7);
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-
+        .modal h2 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+        .modal p { color: rgba(255, 180, 140, 0.7); font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
         .btn-modal {
             background: rgba(255, 60, 30, 0.25);
             border: 1px solid rgba(255, 80, 40, 0.5);
             color: #ff9966;
-            padding: 12px 0;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
+            padding: 12px 0; border-radius: 12px;
+            font-size: 14px; font-weight: 600; cursor: pointer; width: 100%;
             font-family: inherit;
-            transition: all 0.3s;
         }
 
-        .btn-modal:hover {
-            background: rgba(255, 60, 30, 0.4);
-            box-shadow: 0 8px 30px rgba(255, 60, 30, 0.2);
-        }
-
-        .footer {
-            margin-top: 32px;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.2);
-            letter-spacing: 1px;
-        }
-
-        .footer a {
-            color: rgba(255, 140, 80, 0.5);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .footer a:hover { color: #ff8855; }
+        .footer { margin-top: 32px; font-size: 11px; color: rgba(255, 255, 255, 0.2); letter-spacing: 1px; }
+        .footer a { color: rgba(255, 140, 80, 0.5); text-decoration: none; }
     </style>
 </head>
 <body>
-
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
@@ -354,30 +248,37 @@
     <div class="modal-overlay" id="modal">
         <div class="modal">
             <div class="modal-icon">🚧</div>
-            <h2>Coming Soon</h2>
-            <p>Downloads are not available yet.<br>Wait for the first release of PistlePixel Launcher.</p>
-            <button class="btn-modal" onclick="document.getElementById('modal').classList.remove('active')">Close</button>
+            <h2 data-lang="modalTitle">Coming Soon</h2>
+            <p data-lang="modalText">Downloads are not available yet.<br>Wait for the first release.</p>
+            <button class="btn-modal" onclick="document.getElementById('modal').classList.remove('active')" data-lang="close">Close</button>
         </div>
     </div>
 
     <div class="container">
+        <div class="lang-switch">
+            <div class="lang-toggle">
+                <button class="lang-option active" onclick="setLang('en')">EN</button>
+                <button class="lang-option" onclick="setLang('ru')">RU</button>
+            </div>
+        </div>
+
         <div class="card">
             <h1 class="title">PistlePixel</h1>
-            <p class="subtitle">Minecraft Launcher</p>
-            <div class="badge"><span class="dot"></span>First Release Soon</div>
+            <p class="subtitle" data-lang="subtitle">Minecraft Launcher</p>
+            <div class="badge"><span class="dot"></span><span data-lang="badge">First Release Soon</span></div>
 
             <div class="buttons">
                 <button class="btn btn-primary" onclick="document.getElementById('modal').classList.add('active')">
                     <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h8v2H3V5zm0 4h8v2H3V9zm0 4h8v2H3v-2zm10-4h8v2h-8V9zm0 4h8v2h-8v-2zm0-8h8v2h-8V5z"/></svg>
-                    Download for Windows
+                    <span data-lang="btn1">Download for Windows</span>
                 </button>
                 <button class="btn btn-secondary" onclick="document.getElementById('modal').classList.add('active')">
                     <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-                    Download for Bedrock
+                    <span data-lang="btn2">Download for Bedrock</span>
                 </button>
                 <button class="btn btn-secondary" onclick="document.getElementById('modal').classList.add('active')">
                     <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-                    Download for Linux
+                    <span data-lang="btn3">Download for Linux</span>
                 </button>
             </div>
 
@@ -388,7 +289,38 @@
     <script>
         const tg = window.Telegram?.WebApp;
         if (tg) { tg.ready(); tg.expand(); }
+
+        const langs = {
+            en: {
+                subtitle: 'Minecraft Launcher',
+                badge: 'First Release Soon',
+                btn1: 'Download for Windows',
+                btn2: 'Download for Bedrock',
+                btn3: 'Download for Linux',
+                modalTitle: 'Coming Soon',
+                modalText: 'Downloads are not available yet.<br>Wait for the first release.',
+                close: 'Close'
+            },
+            ru: {
+                subtitle: 'Лаунчер Minecraft',
+                badge: 'Скоро первый релиз',
+                btn1: 'Скачать для Windows',
+                btn2: 'Скачать для Bedrock',
+                btn3: 'Скачать для Linux',
+                modalTitle: 'Скоро',
+                modalText: 'Загрузки пока недоступны.<br>Ожидайте первый релиз.',
+                close: 'Закрыть'
+            }
+        };
+
+        function setLang(lang) {
+            document.querySelectorAll('.lang-option').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.lang-option[onclick="setLang('${lang}')"]`).classList.add('active');
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                if (langs[lang][key]) el.innerHTML = langs[lang][key];
+            });
+        }
     </script>
 </body>
 </html>
-
