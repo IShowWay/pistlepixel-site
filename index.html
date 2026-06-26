@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PistlePixel Launcher</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(180deg, #0a1628 0%, #0f2b4a 100%); min-height: 100vh; color: #fff; display: flex; align-items: center; justify-content: center; padding: 16px; }
+        .container { width: 100%; max-width: 400px; }
+        .card { background: rgba(15,30,55,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(80,160,255,0.2); border-radius: 20px; padding: 35px 28px; text-align: center; }
+        .logo { width: 70px; height: 70px; background: linear-gradient(135deg, #1e90ff, #00bfff); border-radius: 18px; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+        .title { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+        .subtitle { font-size: 12px; color: rgba(180,210,255,0.7); margin-bottom: 30px; letter-spacing: 2px; text-transform: uppercase; }
+        .badge { display: inline-block; background: rgba(255,180,50,0.15); border: 1px solid rgba(255,180,50,0.3); color: #ffb832; font-size: 12px; font-weight: 600; padding: 7px 16px; border-radius: 50px; margin-bottom: 25px; }
+        .buttons { display: flex; flex-direction: column; gap: 10px; }
+        .btn { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; background: rgba(255,255,255,0.03); color: rgba(150,190,230,0.5); border: 1px solid rgba(100,170,255,0.1); cursor: pointer; }
+        .btn:active { transform: scale(0.98); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #0f1e37; border: 1px solid rgba(80,160,255,0.3); border-radius: 18px; padding: 35px 28px; text-align: center; max-width: 340px; width: 100%; }
+        .modal-icon { font-size: 45px; margin-bottom: 15px; }
+        .modal h2 { font-size: 20px; margin-bottom: 10px; }
+        .modal p { color: rgba(180,210,255,0.7); font-size: 13px; line-height: 1.5; margin-bottom: 22px; }
+        .btn-close { background: linear-gradient(135deg, #1e90ff, #0073e6); color: #fff; border: none; padding: 12px 35px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; }
+        .footer { margin-top: 28px; font-size: 11px; color: rgba(150,190,230,0.4); }
+        .footer a { color: rgba(150,190,230,0.6); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="modal-overlay" id="modal">
+        <div class="modal"><div class="modal-icon">🚧</div><h2>Coming Soon</h2><p>Downloads are not available yet.<br>Wait for the first release.</p><button class="btn-close" onclick="document.getElementById('modal').classList.remove('active')">OK</button></div>
+    </div>
+    <div class="container">
+        <div class="card">
+            <div class="logo">🎮</div>
+            <h1 class="title">PistlePixel</h1>
+            <p class="subtitle">Minecraft Launcher</p>
+            <div class="badge">First Release Soon</div>
+            <div class="buttons">
+                <div class="btn" onclick="document.getElementById('modal').classList.add('active')">Download for Windows</div>
+                <div class="btn" onclick="document.getElementById('modal').classList.add('active')">Download for Bedrock</div>
+                <div class="btn" onclick="document.getElementById('modal').classList.add('active')">Download for Linux</div>
+            </div>
+            <p class="footer">PistlePixel &copy; 2026 &nbsp;|&nbsp; <a href="https://t.me/molygench">@molygench</a></p>
+        </div>
+    </div>
+</body>
+</html>
