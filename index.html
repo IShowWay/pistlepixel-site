@@ -1,186 +1,835 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PistlePixel Launcher</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>PistlePixel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#060606;
+    --ash:#131313;
+    --line:#232323;
+    --blood:#ff3b3b;
+    --bone:#eae6da;
+    --dim:#6f6a60;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--void);
+    color:var(--bone);
+    font-family:'JetBrains Mono',monospace;
+    display:flex;
+    flex-direction:column;
+    min-height:100dvh;
+    position:relative;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--blood); color:var(--void); }
+  :focus-visible{ outline:2px solid var(--blood); outline-offset:4px; }
 
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #1a8fe3;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: #ffffff;
-        }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
 
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            pointer-events: none;
-            z-index: 0;
-            animation: orbFloat 8s ease-in-out infinite;
-        }
-        .orb-1 { display: none; }
-        .orb-2 { display: none; }
-        .orb-3 { display: none; }
+  /* film-grain / noise texture */
+  .noise{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index:1;
+    opacity:0.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  /* scanlines */
+  .scan{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index:1;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+  }
+  .glow{
+    position:fixed;
+    top:50%; left:50%;
+    width:900px; height:900px;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(255,59,59,0.10), transparent 65%);
+    pointer-events:none;
+    z-index:0;
+  }
 
-        @keyframes orbFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -30px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
+  header{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:22px 28px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:0.78rem;
+    letter-spacing:1px;
+    color:var(--bone);
+  }
+  .brand-mark{
+    width:10px;height:10px;
+    background:var(--blood);
+    animation:blink 1.4s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0.15; } }
+  .status{
+    font-size:0.72rem;
+    color:var(--dim);
+    letter-spacing:0.5px;
+  }
+  .status b{ color:var(--bone); font-weight:500; }
 
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 440px;
-        }
+  .header-right{
+    display:flex;
+    align-items:center;
+    gap:18px;
+  }
+  .lang-switch{
+    display:flex;
+    border:1px solid var(--line);
+  }
+  .lang-switch button{
+    appearance:none;
+    border:none;
+    background:transparent;
+    color:var(--dim);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.68rem;
+    letter-spacing:1px;
+    padding:7px 12px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .lang-switch button + button{ border-left:1px solid var(--line); }
+  .lang-switch button.active{
+    background:var(--blood);
+    color:var(--void);
+    font-weight:700;
+  }
 
-        .lang-switch { display: flex; justify-content: flex-end; margin-bottom: 16px; }
-        .lang-toggle { display: flex; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 30px; padding: 4px; gap: 2px; }
-        .lang-option { padding: 8px 16px; border-radius: 26px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s; border: none; background: transparent; color: rgba(255,255,255,0.4); font-family: inherit; }
-        .lang-option.active { background: rgba(255,60,30,0.25); color: #ff8855; box-shadow: 0 2px 10px rgba(255,60,30,0.2); }
+  main{
+    position:relative;
+    z-index:2;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:40px 24px 60px;
+    gap:34px;
+  }
 
-        .card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 28px;
-            padding: 45px 35px;
-            text-align: center;
-        }
+  .tag{
+    font-size:0.72rem;
+    letter-spacing:3px;
+    color:var(--blood);
+    text-transform:uppercase;
+  }
 
-        .title {
-            font-size: 30px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #ffffff 0%, #ff9966 50%, #ff5520 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 6px;
-        }
+  h1{
+    margin:0;
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(1.6rem, 8vw, 3.4rem);
+    color:var(--bone);
+    letter-spacing:1px;
+    position:relative;
+  }
+  h1 .glitch-layer{
+    position:absolute; inset:0;
+    color:var(--blood);
+    clip-path:polygon(0 0,100% 0,100% 30%,0 30%);
+    animation:glitch 4.5s infinite;
+    opacity:0.7;
+  }
+  @keyframes glitch{
+    0%,92%,100%{ transform:translate(0,0); opacity:0; }
+    93%{ transform:translate(-3px,1px); opacity:0.8; }
+    95%{ transform:translate(3px,-1px); opacity:0.6; }
+    97%{ transform:translate(-2px,0); opacity:0.4; }
+  }
 
-        .subtitle {
-            font-size: 12px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: rgba(255, 150, 80, 0.7);
-            margin-bottom: 35px;
-            font-weight: 500;
-        }
+  .lede{
+    margin:0;
+    color:var(--dim);
+    font-size:0.9rem;
+    letter-spacing:0.5px;
+    max-width:360px;
+  }
 
-        .buttons { display: flex; flex-direction: column; gap: 12px; }
+  .edition{
+    display:inline-flex;
+    background:var(--ash);
+    border:1px solid var(--line);
+    padding:4px;
+  }
+  .edition button{
+    appearance:none;
+    border:none;
+    background:transparent;
+    color:var(--dim);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.78rem;
+    letter-spacing:1px;
+    padding:10px 22px;
+    cursor:pointer;
+    transition:color .15s ease, background .15s ease;
+  }
+  .edition button.active{
+    background:var(--blood);
+    color:var(--void);
+    font-weight:700;
+  }
 
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 16px 24px;
-            border-radius: 14px;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 1px solid transparent;
-            background: transparent;
-            color: #fff;
-            font-family: inherit;
-            width: 100%;
-        }
+  .ip-block{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:center;
+  }
+  .ip-cell{
+    display:flex;
+    align-items:stretch;
+    border:1px solid var(--line);
+    background:var(--ash);
+  }
+  .ip-cell .ip-label{
+    display:flex;
+    align-items:center;
+    padding:0 12px;
+    font-size:0.62rem;
+    letter-spacing:1px;
+    color:var(--dim);
+    text-transform:uppercase;
+    border-right:1px solid var(--line);
+  }
+  .ip-cell .ip-value{
+    padding:18px 22px;
+    font-size:1.05rem;
+    color:var(--bone);
+    letter-spacing:0.5px;
+    white-space:nowrap;
+    display:flex;
+    align-items:center;
+  }
+  .ip-cell button{
+    appearance:none;
+    border:none;
+    border-left:1px solid var(--line);
+    background:var(--void);
+    color:var(--blood);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    letter-spacing:1px;
+    padding:0 22px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .ip-cell button:hover{ background:var(--blood); color:var(--void); }
 
-        .btn-primary { background: rgba(255, 60, 30, 0.2); border-color: rgba(255, 80, 40, 0.4); color: #ff8855; }
-        .btn-primary:hover { background: rgba(255, 60, 30, 0.3); border-color: rgba(255, 80, 40, 0.7); transform: translateY(-2px); box-shadow: 0 10px 40px rgba(255, 60, 30, 0.2); }
-        .btn-secondary { background: rgba(255, 255, 255, 0.02); border-color: rgba(255, 255, 255, 0.08); color: rgba(255, 170, 110, 0.8); }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); color: #ff9966; }
-        .btn-icon { width: 18px; height: 18px; opacity: 0.7; flex-shrink: 0; }
+  .hint{
+    font-size:0.7rem;
+    color:var(--dim);
+    letter-spacing:0.5px;
+  }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-overlay.active { display: flex; }
-        .modal { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(30px); border: 1px solid rgba(255, 80, 40, 0.3); border-radius: 24px; padding: 40px 30px; text-align: center; max-width: 360px; width: 100%; }
-        .modal-icon { width: 60px; height: 60px; background: rgba(255, 60, 30, 0.15); border: 1px solid rgba(255, 80, 40, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 20px; }
-        .modal h2 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
-        .modal p { color: rgba(255, 180, 140, 0.7); font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
-        .btn-modal { background: rgba(255, 60, 30, 0.25); border: 1px solid rgba(255, 80, 40, 0.5); color: #ff9966; padding: 12px 0; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; font-family: inherit; }
+  .access-btn{
+    position:relative;
+    overflow:hidden;
+    appearance:none;
+    border:none;
+    background:linear-gradient(115deg, #ff3b3b 0%, #ff8a3b 25%, #ff3b3b 50%, #b31f1f 75%, #ff3b3b 100%);
+    background-size:300% 100%;
+    animation:accessFlow 5s linear infinite;
+    color:var(--void);
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    font-size:0.82rem;
+    letter-spacing:1px;
+    padding:16px 34px;
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+    margin-top:4px;
+    box-shadow:0 0 24px rgba(255,59,59,0.25);
+  }
+  .access-btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 0 32px rgba(255,59,59,0.4);
+  }
+  .access-btn::after{
+    content:"";
+    position:absolute;
+    top:0; left:-40%;
+    width:30%; height:100%;
+    background:linear-gradient(115deg, transparent, rgba(255,255,255,0.55), transparent);
+    transform:skewX(-20deg);
+    animation:accessShine 3.4s ease-in-out infinite;
+  }
+  @keyframes accessFlow{
+    0%{ background-position:0% 50%; }
+    100%{ background-position:300% 50%; }
+  }
+  @keyframes accessShine{
+    0%{ left:-40%; }
+    55%{ left:130%; }
+    100%{ left:130%; }
+  }
 
-        .footer { margin-top: 32px; font-size: 11px; color: rgba(255, 255, 255, 0.2); letter-spacing: 1px; }
-        .footer a { color: rgba(255, 140, 80, 0.5); text-decoration: none; }
-    </style>
+  /* ---------- modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    z-index:50;
+    background:rgba(4,4,4,0.85);
+    backdrop-filter:blur(4px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .modal-overlay.open{ display:flex; }
+
+  .modal{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    background:var(--ash);
+    border:1px solid var(--line);
+    padding:32px 28px 28px;
+  }
+  .modal-close{
+    position:absolute;
+    top:14px; right:14px;
+    appearance:none; border:none; background:transparent;
+    color:var(--dim);
+    font-family:'JetBrains Mono',monospace;
+    font-size:1.1rem;
+    cursor:pointer;
+    line-height:1;
+    padding:6px;
+  }
+  .modal-close:hover{ color:var(--bone); }
+
+  .modal-dots{
+    display:flex;
+    gap:6px;
+    margin-bottom:22px;
+  }
+  .modal-dots span{
+    width:22px; height:3px;
+    background:var(--line);
+  }
+  .modal-dots span.done{ background:var(--blood); }
+  .modal-dots span.active{ background:var(--bone); }
+
+  .modal-tag{
+    font-size:0.68rem;
+    letter-spacing:2px;
+    color:var(--blood);
+    text-transform:uppercase;
+    display:block;
+    margin-bottom:10px;
+  }
+  .modal h3{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    font-size:1.05rem;
+    color:var(--bone);
+    margin:0 0 22px;
+    letter-spacing:0.5px;
+  }
+
+  .modal-options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:8px;
+  }
+  .modal-option{
+    appearance:none;
+    border:1px solid var(--line);
+    background:var(--void);
+    color:var(--bone);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.85rem;
+    letter-spacing:0.5px;
+    padding:20px 12px;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .modal-option svg{ width:26px; height:26px; opacity:0.8; }
+  .modal-option:hover{ border-color:var(--blood); }
+  .modal-option.selected{ border-color:var(--blood); background:rgba(255,59,59,0.08); }
+
+  .modal-back{
+    appearance:none; border:none; background:transparent;
+    color:var(--dim);
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    letter-spacing:1px;
+    cursor:pointer;
+    padding:6px 0;
+    margin-top:14px;
+  }
+  .modal-back:hover{ color:var(--bone); }
+
+  .modal-summary{
+    font-size:0.78rem;
+    color:var(--dim);
+    letter-spacing:0.5px;
+    margin-bottom:22px;
+    line-height:1.7;
+  }
+  .modal-summary b{ color:var(--bone); font-weight:500; }
+
+  .modal-download{
+    width:100%;
+    appearance:none;
+    border:1px solid var(--blood);
+    background:var(--blood);
+    color:var(--void);
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    font-size:0.82rem;
+    letter-spacing:1px;
+    padding:16px;
+    cursor:pointer;
+    transition:opacity .15s ease;
+  }
+  .modal-download:hover{ opacity:0.85; }
+
+  .modal-error{
+    display:none;
+    margin-top:16px;
+    padding:14px 16px;
+    border:1px solid var(--blood);
+    background:rgba(255,59,59,0.08);
+    color:var(--bone);
+    font-size:0.76rem;
+    letter-spacing:0.3px;
+    line-height:1.6;
+  }
+  .modal-error.show{ display:block; }
+  .modal-error b{ color:var(--blood); }
+
+  @media (max-width:480px){
+    .modal{ padding:26px 20px 22px; }
+    .modal-options{ grid-template-columns:1fr 1fr; }
+  }
+
+  footer{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:26px;
+    padding:20px 24px 26px;
+    font-size:0.72rem;
+    color:var(--dim);
+    letter-spacing:0.5px;
+  }
+  footer a{
+    color:var(--dim);
+    text-decoration:none;
+    transition:color .15s ease;
+  }
+  footer a:hover{ color:var(--bone); }
+  .dot-sep{ color:var(--line); }
+
+  @media (max-width:520px){
+    header{ padding:18px 18px; }
+    .status{ display:none; }
+    .header-right{ gap:0; }
+    main{ gap:26px; padding:20px 18px 40px; }
+    .ip-block{ flex-direction:column; width:100%; max-width:340px; }
+    .ip-cell{ width:100%; }
+    .ip-cell .ip-value{ flex:1; justify-content:center; }
+    .ip-cell button{ border-left:none; border-top:1px solid var(--line); padding:14px; }
+    footer{ flex-wrap:wrap; gap:14px 20px; }
+  }
+</style>
 </head>
 <body>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
 
-    <div class="modal-overlay" id="modal">
-        <div class="modal">
-            <div class="modal-icon">🚧</div>
-            <h2 data-lang="modalTitle">Coming Soon</h2>
-            <p data-lang="modalText">Downloads are not available yet.<br>Wait for the first release.</p>
-            <button class="btn-modal" onclick="document.getElementById('modal').classList.remove('active')" data-lang="close">Close</button>
-        </div>
+<div class="noise"></div>
+<div class="scan"></div>
+<div class="glow"></div>
+
+<header>
+  <div class="brand"><span class="brand-mark"></span> PISTLEPIXEL</div>
+  <div class="header-right">
+    <div class="status"><b id="playerCount">412</b> <span id="statusLabel">online</span></div>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" id="langRu" class="active">RU</button>
+      <button type="button" id="langEn">EN</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <span class="tag" id="tagText">Анархия · Без правил</span>
+
+  <h1>
+    PISTLEPIXEL
+    <span class="glitch-layer" aria-hidden="true">PISTLEPIXEL</span>
+  </h1>
+
+  <p class="lede" id="ledeText">Ничего не защищено. Ничего не безопасно. Играй на свой страх и риск.</p>
+
+  <div class="edition" role="tablist" aria-label="Choose edition">
+    <button type="button" class="active" id="btnJava" role="tab" aria-selected="true">PC / Java</button>
+    <button type="button" id="btnBedrock" role="tab" aria-selected="false">Bedrock</button>
+  </div>
+
+  <div class="ip-block" id="ipBlock">
+    <div class="ip-cell">
+      <span class="ip-label">IP</span>
+      <span class="ip-value" id="ipText">play.pistlepixel.net</span>
+      <button id="copyIpBtn">Copy</button>
+    </div>
+    <div class="ip-cell" id="portCell" style="display:none;">
+      <span class="ip-label">Port</span>
+      <span class="ip-value" id="portText">25581</span>
+      <button id="copyPortBtn">Copy</button>
+    </div>
+  </div>
+
+  <span class="hint" id="hintText">Paste this into "Add Server" and connect.</span>
+
+  <button type="button" class="access-btn" id="openLauncher"><span id="accessBtnLabel">Скачать лаунчер</span> →</button>
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button type="button" class="modal-close" id="modalClose" aria-label="Закрыть">✕</button>
+    <div class="modal-dots">
+      <span id="dot1"></span><span id="dot2"></span><span id="dot3"></span>
     </div>
 
-    <div class="container">
-        <div class="lang-switch">
-            <div class="lang-toggle">
-                <button class="lang-option active" onclick="setLang('en')">EN</button>
-                <button class="lang-option" onclick="setLang('ru')">RU</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <h1 class="title">PistlePixel</h1>
-            <p class="subtitle" data-lang="subtitle">Minecraft Launcher</p>
-
-            <div class="buttons">
-                <button class="btn btn-primary" onclick="document.getElementById('modal').classList.add('active')">
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h8v2H3V5zm0 4h8v2H3V9zm0 4h8v2H3v-2zm10-4h8v2h-8V9zm0 4h8v2h-8v-2zm0-8h8v2h-8V5z"/></svg>
-                    <span data-lang="btn1">Download for Windows</span>
-                </button>
-                <button class="btn btn-secondary" onclick="document.getElementById('modal').classList.add('active')">
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-                    <span data-lang="btn2">Download for Bedrock</span>
-                </button>
-                <button class="btn btn-secondary" onclick="document.getElementById('modal').classList.add('active')">
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-                    <span data-lang="btn3">Download for Linux</span>
-                </button>
-            </div>
-
-            <p class="footer">PistlePixel &copy; 2026 &nbsp;|&nbsp; <a href="https://t.me/molygench">@molygench</a></p>
-        </div>
+    <!-- step 1: OS -->
+    <div class="modal-step" id="step1">
+      <span class="modal-tag" id="step1Tag">Шаг 1 из 3</span>
+      <h3 id="modalTitle">Выбери систему</h3>
+      <div class="modal-options">
+        <button type="button" class="modal-option" data-os="windows">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5L10 4.4v7.1H3V5.5zM11 4.2L21 3v8.5H11V4.2zM3 12.5h7v7.1L3 18.5v-6zM11 12.5h10V21l-10-1.4v-7.1z"/></svg>
+          Windows
+        </button>
+        <button type="button" class="modal-option" data-os="linux">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8 6 6 9 6 13c0 3.5 2.7 6.3 6 6.3s6-2.8 6-6.3c0-4-2-7-6-11z"/></svg>
+          Linux
+        </button>
+      </div>
     </div>
 
-    <script>
-        const tg = window.Telegram?.WebApp;
-        if (tg) { tg.ready(); tg.expand(); }
+    <!-- step 2: edition -->
+    <div class="modal-step" id="step2" style="display:none;">
+      <span class="modal-tag" id="step2Tag">Шаг 2 из 3</span>
+      <h3 id="step2Title">Выбери версию игры</h3>
+      <div class="modal-options">
+        <button type="button" class="modal-option" data-edition="java">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l9 5-9 5-9-5 9-5z" fill="currentColor"/><path d="M3 13l9 5 9-5" stroke="currentColor" stroke-width="1.6"/></svg>
+          Java
+        </button>
+        <button type="button" class="modal-option" data-edition="bedrock">
+          <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" fill="currentColor" opacity="0.85"/></svg>
+          Bedrock
+        </button>
+      </div>
+      <button type="button" class="modal-back" id="backTo1">← назад</button>
+    </div>
 
-        const langs = {
-            en: { subtitle: 'Minecraft Launcher', btn1: 'Download for Windows', btn2: 'Download for Bedrock', btn3: 'Download for Linux', modalTitle: 'Coming Soon', modalText: 'Downloads are not available yet.<br>Wait for the first release.', close: 'Close' },
-            ru: { subtitle: 'Лаунчер Minecraft', btn1: 'Скачать для Windows', btn2: 'Скачать для Bedrock', btn3: 'Скачать для Linux', modalTitle: 'Скоро', modalText: 'Загрузки пока недоступны.<br>Ожидайте первый релиз.', close: 'Закрыть' }
-        };
+    <!-- step 3: download -->
+    <div class="modal-step" id="step3" style="display:none;">
+      <span class="modal-tag" id="step3Tag">Шаг 3 из 3</span>
+      <h3 id="step3Title">Всё готово</h3>
+      <p class="modal-summary"><span id="sumSystemLabel">Система</span>: <b id="sumOs">—</b> · <span id="sumVersionLabel">Версия</span>: <b id="sumEdition">—</b></p>
+      <button type="button" class="modal-download" id="downloadBtn">Скачать лаунчер</button>
+      <div class="modal-error" id="modalError">
+        <b id="errorBold">Лаунчер пока недоступен.</b><br><span id="errorText">Сервер ещё не открыт — ждите релиза и следите за новостями в Telegram.</span>
+      </div>
+      <button type="button" class="modal-back" id="backTo2">← назад</button>
+    </div>
 
-        function setLang(lang) {
-            document.querySelectorAll('.lang-option').forEach(b => b.classList.remove('active'));
-            document.querySelector(`.lang-option[onclick="setLang('${lang}')"]`).classList.add('active');
-            document.querySelectorAll('[data-lang]').forEach(el => {
-                const key = el.getAttribute('data-lang');
-                if (langs[lang][key]) el.innerHTML = langs[lang][key];
-            });
-        }
-    </script>
+  </div>
+</div>
+
+<footer>
+  <a href="#">Discord</a>
+  <span class="dot-sep">·</span>
+  <a href="#" id="footerRules">Rules</a>
+  <span class="dot-sep">·</span>
+  <span id="footerAffiliation">PistlePixel isn't affiliated with Mojang or Microsoft</span>
+</footer>
+
+<script>
+  // ---------- language ----------
+  const LANG = {
+    ru: {
+      online: 'онлайн',
+      tag: 'Анархия · Без правил',
+      lede: 'Ничего не защищено. Ничего не безопасно. Играй на свой страх и риск.',
+      hintBedrock: 'Добавь как сервер в Bedrock — адрес и порт указаны отдельно.',
+      accessBtn: 'Скачать лаунчер',
+      modalClose: 'Закрыть',
+      step1Tag: 'Шаг 1 из 3',
+      step1Title: 'Выбери систему',
+      step2Tag: 'Шаг 2 из 3',
+      step2Title: 'Выбери версию игры',
+      back: '← назад',
+      step3Tag: 'Шаг 3 из 3',
+      step3Title: 'Всё готово',
+      sumSystem: 'Система',
+      sumVersion: 'Версия',
+      downloadBtn: 'Скачать лаунчер',
+      downloadBtnDisabled: 'Пока недоступно',
+      errorBold: 'Лаунчер пока недоступен.',
+      errorText: 'Сервер ещё не открыт — ждите релиза и следите за новостями в Telegram.',
+      copy: 'Копировать',
+      copied: 'Скопировано',
+      footerRules: 'Правила',
+      footerAffiliation: 'PistlePixel не связан с Mojang или Microsoft',
+    },
+    en: {
+      online: 'online',
+      tag: 'Anarchy · No rules',
+      lede: 'Nothing is protected. Nothing is safe. Play at your own risk.',
+      hintBedrock: 'Add this as a server in Bedrock — address and port are separate.',
+      accessBtn: 'Download launcher',
+      modalClose: 'Close',
+      step1Tag: 'Step 1 of 3',
+      step1Title: 'Choose your system',
+      step2Tag: 'Step 2 of 3',
+      step2Title: 'Choose game edition',
+      back: '← back',
+      step3Tag: 'Step 3 of 3',
+      step3Title: 'All set',
+      sumSystem: 'System',
+      sumVersion: 'Edition',
+      downloadBtn: 'Download launcher',
+      downloadBtnDisabled: 'Not available yet',
+      errorBold: "Launcher isn't available yet.",
+      errorText: "The server hasn't launched — watch for the release on Telegram.",
+      copy: 'Copy',
+      copied: 'Copied',
+      footerRules: 'Rules',
+      footerAffiliation: "PistlePixel isn't affiliated with Mojang or Microsoft",
+    }
+  };
+
+  let currentLang = 'ru';
+
+  const langRu = document.getElementById('langRu');
+  const langEn = document.getElementById('langEn');
+  const statusLabel = document.getElementById('statusLabel');
+  const tagText = document.getElementById('tagText');
+  const ledeText = document.getElementById('ledeText');
+  const accessBtnLabel = document.getElementById('accessBtnLabel');
+  const modalCloseBtn = document.getElementById('modalClose');
+  const step1Tag = document.getElementById('step1Tag');
+  const modalTitle = document.getElementById('modalTitle');
+  const step2Tag = document.getElementById('step2Tag');
+  const step2Title = document.getElementById('step2Title');
+  const backTo1 = document.getElementById('backTo1');
+  const step3Tag = document.getElementById('step3Tag');
+  const step3Title = document.getElementById('step3Title');
+  const sumSystemLabel = document.getElementById('sumSystemLabel');
+  const sumVersionLabel = document.getElementById('sumVersionLabel');
+  const errorBold = document.getElementById('errorBold');
+  const errorText = document.getElementById('errorText');
+  const backTo2 = document.getElementById('backTo2');
+  const footerRules = document.getElementById('footerRules');
+  const footerAffiliation = document.getElementById('footerAffiliation');
+
+  function applyLang(lang){
+    currentLang = lang;
+    const t = LANG[lang];
+    document.documentElement.lang = lang;
+    langRu.classList.toggle('active', lang === 'ru');
+    langEn.classList.toggle('active', lang === 'en');
+
+    statusLabel.textContent = t.online;
+    tagText.textContent = t.tag;
+    ledeText.textContent = t.lede;
+    accessBtnLabel.textContent = t.accessBtn;
+    modalCloseBtn.setAttribute('aria-label', t.modalClose);
+    step1Tag.textContent = t.step1Tag;
+    modalTitle.textContent = t.step1Title;
+    step2Tag.textContent = t.step2Tag;
+    step2Title.textContent = t.step2Title;
+    backTo1.textContent = t.back;
+    step3Tag.textContent = t.step3Tag;
+    step3Title.textContent = t.step3Title;
+    sumSystemLabel.textContent = t.sumSystem;
+    sumVersionLabel.textContent = t.sumVersion;
+    downloadBtn.textContent = downloadBtn.dataset.disabled === 'true' ? t.downloadBtnDisabled : t.downloadBtn;
+    errorBold.textContent = t.errorBold;
+    errorText.textContent = t.errorText;
+    backTo2.textContent = t.back;
+    footerRules.textContent = t.footerRules;
+    footerAffiliation.textContent = t.footerAffiliation;
+    copyIpBtn.textContent = t.copy;
+    copyPortBtn.textContent = t.copy;
+
+    // re-apply edition-specific hint in the current language
+    setEdition(btnJava.classList.contains('active') ? 'java' : 'bedrock');
+  }
+
+  langRu.addEventListener('click', () => applyLang('ru'));
+  langEn.addEventListener('click', () => applyLang('en'));
+
+  const JAVA_IP = 'play.pistlepixel.net';
+  const BEDROCK_IP = 'mrdio.my-craft.cc';
+  const BEDROCK_PORT = '25581';
+
+  const btnJava = document.getElementById('btnJava');
+  const btnBedrock = document.getElementById('btnBedrock');
+  const ipText = document.getElementById('ipText');
+  const portText = document.getElementById('portText');
+  const portCell = document.getElementById('portCell');
+  const hintText = document.getElementById('hintText');
+  const ipBlock = document.getElementById('ipBlock');
+  const copyIpBtn = document.getElementById('copyIpBtn');
+  const copyPortBtn = document.getElementById('copyPortBtn');
+
+  function setEdition(edition){
+    const isJava = edition === 'java';
+    ipText.textContent = isJava ? JAVA_IP : BEDROCK_IP;
+    portCell.style.display = isJava ? 'none' : 'flex';
+    if (!isJava) portText.textContent = BEDROCK_PORT;
+    ipBlock.style.display = isJava ? 'none' : 'flex';
+    hintText.style.display = isJava ? 'none' : 'block';
+    hintText.textContent = isJava ? '' : LANG[currentLang].hintBedrock;
+    btnJava.classList.toggle('active', isJava);
+    btnBedrock.classList.toggle('active', !isJava);
+    btnJava.setAttribute('aria-selected', isJava);
+    btnBedrock.setAttribute('aria-selected', !isJava);
+  }
+
+  btnJava.addEventListener('click', () => setEdition('java'));
+  btnBedrock.addEventListener('click', () => setEdition('bedrock'));
+  setEdition('java');
+
+  function copyValue(btn, value){
+    const done = () => {
+      btn.textContent = LANG[currentLang].copied;
+      setTimeout(() => btn.textContent = LANG[currentLang].copy, 1400);
+    };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(value).then(done).catch(done);
+    } else {
+      done();
+    }
+  }
+
+  copyIpBtn.addEventListener('click', () => copyValue(copyIpBtn, ipText.textContent.trim()));
+  copyPortBtn.addEventListener('click', () => copyValue(copyPortBtn, portText.textContent.trim()));
+
+  // ---------- launcher modal ----------
+  const overlay = document.getElementById('modalOverlay');
+  const openBtn = document.getElementById('openLauncher');
+  const closeBtn = document.getElementById('modalClose');
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const step3 = document.getElementById('step3');
+  const dot1 = document.getElementById('dot1');
+  const dot2 = document.getElementById('dot2');
+  const dot3 = document.getElementById('dot3');
+  const sumOs = document.getElementById('sumOs');
+  const sumEdition = document.getElementById('sumEdition');
+  const modalError = document.getElementById('modalError');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  const OS_LABEL = { windows: 'Windows', linux: 'Linux' };
+  const EDITION_LABEL = { java: 'Java', bedrock: 'Bedrock' };
+  let chosenOs = null;
+  let chosenEdition = null;
+
+  function showStep(n){
+    step1.style.display = n === 1 ? 'block' : 'none';
+    step2.style.display = n === 2 ? 'block' : 'none';
+    step3.style.display = n === 3 ? 'block' : 'none';
+    dot1.className = n > 1 ? 'done' : 'active';
+    dot2.className = n > 2 ? 'done' : (n === 2 ? 'active' : '');
+    dot3.className = n === 3 ? 'active' : '';
+  }
+
+  function resetModal(){
+    chosenOs = null;
+    chosenEdition = null;
+    modalError.classList.remove('show');
+    downloadBtn.dataset.disabled = 'false';
+    downloadBtn.textContent = LANG[currentLang].downloadBtn;
+    document.querySelectorAll('.modal-option').forEach(b => b.classList.remove('selected'));
+    showStep(1);
+  }
+
+  function openModal(){
+    resetModal();
+    overlay.classList.add('open');
+  }
+  function closeModal(){
+    overlay.classList.remove('open');
+  }
+
+  openBtn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  step1.querySelectorAll('[data-os]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      chosenOs = btn.dataset.os;
+      setTimeout(() => showStep(2), 120);
+    });
+  });
+
+  step2.querySelectorAll('[data-edition]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      chosenEdition = btn.dataset.edition;
+      sumOs.textContent = OS_LABEL[chosenOs];
+      sumEdition.textContent = EDITION_LABEL[chosenEdition];
+      modalError.classList.remove('show');
+      downloadBtn.dataset.disabled = 'false';
+      downloadBtn.textContent = LANG[currentLang].downloadBtn;
+      setTimeout(() => showStep(3), 120);
+    });
+  });
+
+  document.getElementById('backTo1').addEventListener('click', () => showStep(1));
+  document.getElementById('backTo2').addEventListener('click', () => { modalError.classList.remove('show'); showStep(2); });
+
+  downloadBtn.addEventListener('click', () => {
+    modalError.classList.add('show');
+    downloadBtn.dataset.disabled = 'true';
+    downloadBtn.textContent = LANG[currentLang].downloadBtnDisabled;
+  });
+
+  const playerEl = document.getElementById('playerCount');
+  let count = 412;
+  setInterval(() => {
+    count += Math.floor(Math.random() * 5) - 2;
+    count = Math.max(340, Math.min(480, count));
+    playerEl.textContent = count;
+  }, 3400);
+
+  applyLang('ru');
+</script>
+
 </body>
 </html>
-
